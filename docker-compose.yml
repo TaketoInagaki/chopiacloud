@@ -1,0 +1,38 @@
+services:
+    app:
+        container_name: app
+        build: ./golang
+        tty: true
+        ports:
+            - "8080:8080"
+        env_file:
+            - ./mysql/.env
+        depends_on:
+            - db
+        volumes:
+            - ./golang/app:/go/src/app
+            - /Users/taketo.inagaki/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+        networks:
+            - golang_test_network
+
+    db:
+        container_name: db
+        build: ./mysql
+        tty: true
+        platform: linux/x86_64
+        ports:
+            - 3306:3306
+        env_file:
+            - ./mysql/.env
+        volumes:
+            - mysql_test_volume:/var/lib/mysql
+        networks:
+            - golang_test_network
+
+volumes:
+    mysql_test_volume:
+        name: mysql_test_volume
+
+networks:
+    golang_test_network:
+        external: true
